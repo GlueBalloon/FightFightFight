@@ -377,7 +377,7 @@ end
 function drawUnits(units)
     -- First Pass: Draw all shadows and selected-unit indicators
     for i, unit in ipairs(units) do
-
+        if unit.alive then
             local x = unit.position.x + unit.visualOffset.x
             local y = unit.position.y + unit.visualOffset.y
             
@@ -403,7 +403,7 @@ function drawUnits(units)
         local x = unit.position.x + unit.visualOffset.x
         local y = unit.position.y + unit.visualOffset.y
         stroke(255, 169, 0)
-        strokeWidth(12.9)
+        strokeWidth(17.9)
         local highlightSize = unit.diameter * 1.65  -- Highlight is slightly larger than the unit
         roundedRectangle{
             x = x,
@@ -414,7 +414,55 @@ function drawUnits(units)
         }
     end
     
-
+    -- Second Pass: Draw all units
+--[[
+    for i, unit in ipairs(units) do
+        if unit.alive then
+            local x = unit.position.x + unit.visualOffset.x
+            local y = unit.position.y + unit.visualOffset.y
+          --  local playerColor = unit.owner == Player.player1 and color(0, 0, 255) or color(255, 0, 0)
+            
+            -- Draw the unit with its actual color
+            fill(unit.color)
+            stroke(184, 67, 236)  -- Lavender stroke color for units
+            strokeWidth(0.75)  -- Stroke width for unit outline
+            roundedRectangle{
+                x = x,
+                y = y,
+                w = unit.diameter,
+                h = unit.diameter,
+                radius = unit.diameter / 4,
+                corners = 15
+            }
+        
+            -- Text settings based on unit status
+            pushStyle()
+            local textSpec = gameModel:ifPlayerIfOtherIfNone(
+            unit.owner,
+            {
+                font = unit.strengthRevealed and "Helvetica-Bold" or "Helvetica",
+                color = unit.strengthRevealed and color(255) or color(255, 145),
+                text = tostring(unit.strength)
+            },
+            {
+                font = "Helvetica-Bold",
+                color = color(255),
+                text = unit.strengthRevealed and tostring(unit.strength) or "--"
+            },
+            {
+                font = "Helvetica",
+                color = color(255, 145),
+                text = "--"
+            }
+            )
+            fontSize(unit.animatedFontSize or 20)
+            font(textSpec.font)
+            fill(textSpec.color)
+            text(textSpec.text, x, y)
+            popStyle()
+        end
+    end
+]]
 
     -- draw all current-player-unit outlines
     for i, unit in ipairs(units) do

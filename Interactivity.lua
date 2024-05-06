@@ -26,7 +26,10 @@ function Interactivity:init(gameModel, commitButtonParams, resignButtonParams)
     end)
     self.screenSensor = Sensor{parent = {x=0,y=0,w=WIDTH,h=HEIGHT}}
     self.screenSensor:onTap( function(event) 
-        gameModel.selectedUnit = nil
+        if gameModel.selectedUnit then
+            gameModel.selectedUnit.target = nil
+            gameModel.selectedUnit = nil
+        end
     end )
     self:setUnitSensors(gameModel.units)
     self:setPlayAreaSensor(gameModel.playArea)
@@ -93,6 +96,34 @@ function Interactivity:unitTapHandler(unit)
     else
         flashScreen = true  -- Trigger the flash
         flashDuration = 0.15  -- Set the duration of the flash
+    end
+end
+
+function Interactivity:unitTapHandler(unit)
+    print("tapped unit")
+    if not unit.alive then return end
+    local selectedUnit = self.gameModel.selectedUnit
+    
+    -- Deselect if the same unit is tapped again
+    if selectedUnit == unit then
+        selectedUnit.target = nil
+        self.gameModel.selectedUnit = nil
+        return
+    end
+    
+    -- If there is a selected unit, set or change the target
+    if selectedUnit then
+        selectedUnit.target = unit
+    else
+        -- No unit is selected
+        if self.gameModel.turnManager:isPlayerTurn(unit.owner) then
+            -- Select the unit if it belongs to the current player
+            self.gameModel:selectUnit(unit)
+        else
+            -- Flash the screen if the unit belongs to the opponent and no unit is selected
+            flashScreen = true
+            flashDuration = 0.15
+        end
     end
 end
 
