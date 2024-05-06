@@ -275,14 +275,14 @@ function GameModel:createUnits()
     local idCounter = 0
     local strengths = {4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 9}  -- Assuming both players have units with the same strength distribution
     local strengths = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 10, 10, 12, 20}  
-    local strengths = {10, 10, 12, 12, 14}  
+    local strengths = {8, 8, 12, 12, 12, 12, 12, 16, 16}  
     local baseDiameter = math.min(self.playArea.width, self.playArea.height) / 15
     
     -- Create units for both players within a single unified loop
     for playerNum = 1, 2 do  -- Assuming two players: Player.player1 and Player.player2
         for i, strength in ipairs(strengths) do
             idCounter = idCounter + 1
-            local unitDiameter = baseDiameter + (baseDiameter * 0.35 * math.random())
+            local unitDiameter = baseDiameter + (baseDiameter * 0.5 * math.random())
             local x, y
             local unit, unitRect
             

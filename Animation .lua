@@ -88,7 +88,7 @@ function animateAttackSequence(attackRecords, index)
     -- Start the enlargement animation
     enlargeStrengthsAnimation(function()
         -- When enlargement is complete, start jittering both simultaneously
-        local jitterDuration = 0.5
+        local jitterDuration = 0.35
         local jitterIntensity = 3
         local numJitters = 28
         local jitterCompleteCount = 0
@@ -128,7 +128,7 @@ end
 
 function shrinkStrengthAnimation(callback)
     -- Start animation tweens for font size
-    tween(0.85, currentCombatAnimation, {defenderFontSize = 20}, tween.easing.outQuad, function()
+    tween(0.35, currentCombatAnimation, {defenderFontSize = 20}, tween.easing.outQuad, function()
         callback()
     end)
 end

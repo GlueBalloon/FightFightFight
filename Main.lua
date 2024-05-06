@@ -1,4 +1,4 @@
---Close Combat
+--Baba Dagas
 --by UberGoober
 
 scores = { player1 = 0, player2 = 0 }
@@ -218,21 +218,48 @@ function draw()
         fill(74, 63, 105, 220)  -- Semi-transparent overlay with increased opacity for better readability
         rect(0, 0, WIDTH, HEIGHT)
         
-        -- Display game over text with a shadow for better visibility
-        fontSize(50)  -- Adjusted font size for the main message
+        -- Prepare text components
+        local gameOver = "GAME"
+        local over = "OVER!"
+        local winnerText = "P" .. (gameModel.winner == Player.player1 and "1" or "2") .. " WINS"
+        
+        -- Font settings for main message
+        fontSize(50)
         font("Helvetica-Bold")
         textWrapWidth(WIDTH - 40)  -- Ensure text fits within screen width with padding
-        local gameOverText = "GAME OVER! P" .. (gameModel.winner == Player.player1 and "1" or "2" .. " WON")
+        textAlign(LEFT)
         
-        -- Shadow for text
+        -- Text positioning
+        local textHeight = HEIGHT / 5 * 3.5  -- Base height for the first line
+        local lineHeight = 60  -- Height adjustment for each subsequent line
+        
+        -- Render each line of text with a shadow for better visibility
+        -- Shadow for "GAME"
         fill(200, 156, 201, 214)  -- Semi-transparent black for shadow
-        text(gameOverText, WIDTH / 2 + 2, HEIGHT / 5 * 2.75 - 2)
+        text(gameOver, WIDTH / 2 + 2, textHeight - 2)
         
-        -- Main text
+        -- Main text "GAME"
         fill(255)  -- White for main text
-        text(gameOverText, WIDTH / 2, HEIGHT / 5 * 2.75)
+        text(gameOver, WIDTH / 2, textHeight)
         
-        fontSize(32)  -- Keeping secondary message font size
+        -- Shadow for "OVER!"
+        fill(200, 156, 201, 214)  -- Semi-transparent black for shadow
+        text(over, WIDTH / 2 + 2, textHeight - lineHeight - 2)
+        
+        -- Main text "OVER!"
+        fill(255)  -- White for main text
+        text(over, WIDTH / 2, textHeight - lineHeight)
+        
+        -- Shadow for "P1 WINS" or "P2 WINS"
+        fill(200, 156, 201, 214)  -- Semi-transparent black for shadow
+        text(winnerText, WIDTH / 2 + 2, textHeight - 2 * lineHeight - 2)
+        
+        -- Main text "P1 WINS" or "P2 WINS"
+        fill(255)  -- White for main text
+        text(winnerText, WIDTH / 2, textHeight - 2 * lineHeight)
+        
+        -- Adjustments for secondary message
+        fontSize(32)
         local continueText = "TAP ANYWHERE TO CONTINUE"
         
         -- Shadow for secondary text
@@ -348,9 +375,9 @@ end
 
 -- Draw function, called every frame
 function drawUnits(units)
-    -- First Pass: Draw all shadows and highlights
+    -- First Pass: Draw all shadows and selected-unit indicators
     for i, unit in ipairs(units) do
-        if unit.alive then
+
             local x = unit.position.x + unit.visualOffset.x
             local y = unit.position.y + unit.visualOffset.y
             
@@ -369,7 +396,7 @@ function drawUnits(units)
         end
     end
     
-    -- Draw the highlight if the unit is selected
+    -- Draw the selected--unit indicator
     if gameModel.selectedUnit then
         local unit = gameModel.selectedUnit
         fill(255, 0)  -- Semi-transparent gold color for highlight
@@ -387,12 +414,42 @@ function drawUnits(units)
         }
     end
     
-    -- Second Pass: Draw all units
+
+
+    -- draw all current-player-unit outlines
     for i, unit in ipairs(units) do
         if unit.alive then
             local x = unit.position.x + unit.visualOffset.x
             local y = unit.position.y + unit.visualOffset.y
-          --  local playerColor = unit.owner == Player.player1 and color(0, 0, 255) or color(255, 0, 0)
+            
+            -- Check if the unit belongs to the current player
+            local isCurrentPlayerUnit = gameModel.turnManager:isPlayerTurn(unit.owner)
+            
+            -- Draw an additional outline for units belonging to the current player
+            if not currentCombatAnimation and isCurrentPlayerUnit then
+                noFill()  -- No fill for the outline
+                stroke(225, 204, 126, 180)  -- Bright color for differentiation, e.g., golden yellow
+                strokeWidth(108)  -- Slightly thicker stroke for visibility
+                roundedRectangle{
+                    x = x,  -- Slightly larger rectangle
+                    y = y,
+                    w = unit.diameter + 12,
+                    h = unit.diameter + 12,
+                    radius = (unit.diameter + 14) / 4,
+                    corners = 15
+                }
+            end
+        end
+    end
+    
+    
+    for i, unit in ipairs(units) do
+        if unit.alive then
+            local x = unit.position.x + unit.visualOffset.x
+            local y = unit.position.y + unit.visualOffset.y
+            
+            -- Check if the unit belongs to the current player
+            local isCurrentPlayerUnit = gameModel.turnManager:isPlayerTurn(unit.owner)
             
             -- Draw the unit with its actual color
             fill(unit.color)
@@ -406,14 +463,14 @@ function drawUnits(units)
                 radius = unit.diameter / 4,
                 corners = 15
             }
-        
+            
             -- Text settings based on unit status
             pushStyle()
             local textSpec = gameModel:ifPlayerIfOtherIfNone(
             unit.owner,
             {
-                font = unit.strengthRevealed and "Helvetica-Bold" or "Helvetica",
-                color = unit.strengthRevealed and color(255) or color(255, 145),
+                font = unit.strengthRevealed and "Helvetica-Bold" or "HelveticaNeue-BoldItalic",
+                color = unit.strengthRevealed and color(255) or color(255, 164),
                 text = tostring(unit.strength)
             },
             {
